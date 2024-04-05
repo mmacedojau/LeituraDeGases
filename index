@@ -1,12 +1,21 @@
 const int pinAnalogico = A0; // Pino analógico conectado ao sensor
+const int pinBuzzer = D1; // Pino digital conectado ao buzzer
 
 void setup() {
   Serial.begin(115200); // Inicializa a comunicação serial com uma taxa de transmissão de 115200 bps
+  pinMode(pinBuzzer, OUTPUT); // Configura o pino do buzzer como saída
 }
 
 void loop() {
   int valorAnalogico = analogRead(pinAnalogico); // Lê o valor analógico do pino A0
   Serial.print("Valor analógico: ");
   Serial.println(valorAnalogico); // Imprime o valor analógico no terminal serial
+  
+  if (valorAnalogico > 60) { // Se o valor analógico for maior que 95
+    digitalWrite(pinBuzzer, HIGH); // Liga o buzzer
+  } else {
+    digitalWrite(pinBuzzer, LOW); // Desliga o buzzer
+  }
+  
   delay(1000); // Aguarda 1 segundo antes de ler novamente
 }
