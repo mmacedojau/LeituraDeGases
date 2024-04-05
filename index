@@ -1,0 +1,12 @@
+const int pinAnalogico = A0; // Pino analógico conectado ao sensor
+
+void setup() {
+  Serial.begin(115200); // Inicializa a comunicação serial com uma taxa de transmissão de 115200 bps
+}
+
+void loop() {
+  int valorAnalogico = analogRead(pinAnalogico); // Lê o valor analógico do pino A0
+  Serial.print("Valor analógico: ");
+  Serial.println(valorAnalogico); // Imprime o valor analógico no terminal serial
+  delay(1000); // Aguarda 1 segundo antes de ler novamente
+}
