@@ -1,21 +1,69 @@
+#include <WiFi.h>
+#include <HTTPClient.h>
+
+const char* ssid = "******************";     // SSID da sua rede WiFi
+const char* password = "*******************"; // Senha da sua rede WiFi
+
 const int pinAnalogico = A0; // Pino analógico conectado ao sensor
-const int pinBuzzer = D1; // Pino digital conectado ao buzzer
+const int pinBuzzer = D1;    // Pino digital conectado ao buzzer
+
+const char* scriptID = "COLOQUE_O_SCRIPT_ID_AQUI"; // ID do script do Google Apps
+const char* sheetName = "COLOQUE_O_NOME_DA_PLANILHA_AQUI"; // Nome da planilha onde os dados serão inseridos
 
 void setup() {
-  Serial.begin(115200); // Inicializa a comunicação serial com uma taxa de transmissão de 115200 bps
-  pinMode(pinBuzzer, OUTPUT); // Configura o pino do buzzer como saída
+  Serial.begin(115200);
+  pinMode(pinBuzzer, OUTPUT);
+  
+  // Conectar à rede WiFi
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(1000);
+    Serial.println("Conectando ao WiFi...");
+  }
+  Serial.println("Conectado ao WiFi!");
+
 }
 
 void loop() {
-  int valorAnalogico = analogRead(pinAnalogico); // Lê o valor analógico do pino A0
+  int valorAnalogico = analogRead(pinAnalogico);
   Serial.print("Valor analógico: ");
-  Serial.println(valorAnalogico); // Imprime o valor analógico no terminal serial
-  
-  if (valorAnalogico > 60) { // Se o valor analógico for maior que 95
-    digitalWrite(pinBuzzer, HIGH); // Liga o buzzer
+  Serial.println(valorAnalogico);
+
+  if (valorAnalogico > 60) {
+    digitalWrite(pinBuzzer, HIGH);
   } else {
-    digitalWrite(pinBuzzer, LOW); // Desliga o buzzer
+    digitalWrite(pinBuzzer, LOW);
   }
-  
-  delay(1000); // Aguarda 1 segundo antes de ler novamente
+
+  // Enviar dados para o Google Sheets
+  enviarParaPlanilha(valorAnalogico);
+
+  delay(1000);
+}
+
+void enviarParaPlanilha(int valor) {
+  if (WiFi.status() == WL_CONNECTED) {
+    HTTPClient http;
+
+    String url = "https://script.google.com/macros/s/" + String(scriptID) + "/exec?value=" + String(valor);
+    
+    Serial.print("Enviando para URL: ");
+    Serial.println(url);
+
+    http.begin(url);  // Especifica o endpoint do Google Apps Script
+
+    int httpResponseCode = http.GET();  // Envia a solicitação GET
+
+    if (httpResponseCode > 0) {
+      Serial.print("Resposta do servidor: ");
+      Serial.println(httpResponseCode);
+    } else {
+      Serial.print("Erro na solicitação HTTP: ");
+      Serial.println(httpResponseCode);
+    }
+
+    http.end();
+  } else {
+    Serial.println("Erro ao conectar ao WiFi!");
+  }
 }
