@@ -13,6 +13,8 @@ const int pinLedVerde = D4;     // Pino digital conectado ao LED verde
 const char* scriptID = "COLOQUE_O_SCRIPT_ID_AQUI"; // ID do script do Google Apps
 const char* sheetName = "COLOQUE_O_NOME_DA_PLANILHA_AQUI"; // Nome da planilha onde os dados serão inseridos
 
+int valorAnterior = 0;
+
 void setup() {
   Serial.begin(115200);
   pinMode(pinBuzzer, OUTPUT);
@@ -52,8 +54,12 @@ void loop() {
     digitalWrite(pinLedVerde, HIGH);
   }
 
-  // Enviar dados para o Google Sheets
-  enviarParaPlanilha(valorAnalogico);
+  // Verificar a oscilação de ±2 na leitura
+  if (abs(valorAnalogico - valorAnterior) > 2) {
+    // Enviar dados para o Google Sheets
+    enviarParaPlanilha(valorAnalogico);
+    valorAnterior = valorAnalogico;
+  }
 
   delay(1000);
 }
