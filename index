@@ -1,11 +1,14 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
 
-const char* ssid = "******************";     // SSID da sua rede WiFi
-const char* password = "*******************"; // Senha da sua rede WiFi
+const char* ssid = "SEU_SSID";     // SSID da sua rede WiFi
+const char* password = "SUA_SENHA"; // Senha da sua rede WiFi
 
 const int pinAnalogico = A0; // Pino analógico conectado ao sensor
 const int pinBuzzer = D1;    // Pino digital conectado ao buzzer
+const int pinLedVermelho = D2;  // Pino digital conectado ao LED vermelho
+const int pinLedAmarelo = D3;   // Pino digital conectado ao LED amarelo
+const int pinLedVerde = D4;     // Pino digital conectado ao LED verde
 
 const char* scriptID = "COLOQUE_O_SCRIPT_ID_AQUI"; // ID do script do Google Apps
 const char* sheetName = "COLOQUE_O_NOME_DA_PLANILHA_AQUI"; // Nome da planilha onde os dados serão inseridos
@@ -13,6 +16,9 @@ const char* sheetName = "COLOQUE_O_NOME_DA_PLANILHA_AQUI"; // Nome da planilha o
 void setup() {
   Serial.begin(115200);
   pinMode(pinBuzzer, OUTPUT);
+  pinMode(pinLedVermelho, OUTPUT);
+  pinMode(pinLedAmarelo, OUTPUT);
+  pinMode(pinLedVerde, OUTPUT);
   
   // Conectar à rede WiFi
   WiFi.begin(ssid, password);
@@ -31,8 +37,19 @@ void loop() {
 
   if (valorAnalogico > 60) {
     digitalWrite(pinBuzzer, HIGH);
+    digitalWrite(pinLedVermelho, HIGH);
+    digitalWrite(pinLedAmarelo, LOW);
+    digitalWrite(pinLedVerde, LOW);
+  } else if (valorAnalogico >= 50 && valorAnalogico <= 60) {
+    digitalWrite(pinBuzzer, LOW);
+    digitalWrite(pinLedVermelho, LOW);
+    digitalWrite(pinLedAmarelo, HIGH);
+    digitalWrite(pinLedVerde, LOW);
   } else {
     digitalWrite(pinBuzzer, LOW);
+    digitalWrite(pinLedVermelho, LOW);
+    digitalWrite(pinLedAmarelo, LOW);
+    digitalWrite(pinLedVerde, HIGH);
   }
 
   // Enviar dados para o Google Sheets
